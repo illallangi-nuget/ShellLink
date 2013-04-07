@@ -1,6 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellLinkSample", "ShellLinkSample.csproj", "{28923F6E-8A68-4BC8-A507-825B09C3F64E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illallangi.ShellLink", "Illallangi.ShellLink\Illallangi.ShellLink.csproj", "{28923F6E-8A68-4BC8-A507-825B09C3F64E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illallangi.ShellLink.Sample", "Illallangi.ShellLink.Sample\Illallangi.ShellLink.Sample.csproj", "{B2216F12-385C-4561-BC06-A2C626684698}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,6 +14,10 @@ Global
 		{28923F6E-8A68-4BC8-A507-825B09C3F64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28923F6E-8A68-4BC8-A507-825B09C3F64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28923F6E-8A68-4BC8-A507-825B09C3F64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2216F12-385C-4561-BC06-A2C626684698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2216F12-385C-4561-BC06-A2C626684698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2216F12-385C-4561-BC06-A2C626684698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2216F12-385C-4561-BC06-A2C626684698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
