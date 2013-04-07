@@ -21,85 +21,77 @@
 
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace Illallangi.ShellLink
 {
-    /// <remarks>
-    ///   .NET friendly wrapper for the ShellLink class
-    /// </remarks>
+    using System.Diagnostics.CodeAnalysis;
+
+    /// <summary>.NET friendly wrapper for the ShellLink class</summary>
     public class ShellShortcut : IDisposable
     {
-        private const int INFOTIPSIZE = 1024;
-        private const int MAX_PATH = 260;
+        #region Fields
 
-        private const int SW_SHOWNORMAL = 1;
-        private const int SW_SHOWMINIMIZED = 2;
-        private const int SW_SHOWMAXIMIZED = 3;
-        private const int SW_SHOWMINNOACTIVE = 7;
+        private const int Infotipsize = 1024;
+        private const int MaxPath = 260;
+        private const int SwShownormal = 1;
+        private const int SwShowminimized = 2;
+        private const int SwShowmaximized = 3;
+        private const int SwShowminnoactive = 7;
 
+        private IShellLinkA currentShellLink;
+        private readonly string currentShellPath;
 
-#if UNICODE
-        private IShellLinkW m_Link;
-#else
-        private IShellLinkA m_Link;
-#endif
+        #endregion
 
-        private string m_sPath;
+        #region Constructors
 
-        ///
-        /// <param name='linkPath'>
-        ///   Path to new or existing shortcut file (.lnk).
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellShortcut"/> class. 
+        /// </summary>
+        /// <param name="linkPath">
+        /// Path to new or existing shortcut file.
         /// </param>
-        ///
         public ShellShortcut(string linkPath)
         {
-            IPersistFile pf;
+            this.currentShellPath = linkPath;
+            this.currentShellLink = (IShellLinkA)new ShellLink();
 
-            this.m_sPath = linkPath;
-
-#if UNICODE
-      m_Link = (IShellLinkW) new ShellLink();
-#else
-            this.m_Link = (IShellLinkA)new ShellLink();
-#endif
-
-            if (File.Exists(linkPath))
+            if (!File.Exists(linkPath))
             {
-                pf = (IPersistFile)this.m_Link;
-                pf.Load(linkPath, 0);
+                return;
             }
 
+            ((IPersistFile)this.currentShellLink).Load(linkPath, 0);
         }
 
-        //
-        //  IDisplosable implementation
-        //
-        public void Dispose()
-        {
-            if (this.m_Link != null)
-            {
-                Marshal.ReleaseComObject(this.m_Link);
-                this.m_Link = null;
-            }
-        }
+        #endregion
+        
+        #region Properties
 
+        /// <summary>
+        /// Gets or sets the argument list of the shortcut.
+        /// </summary>
         /// <value>
-        ///   Gets or sets the argument list of the shortcut.
+        /// The argument list of the shortcut.
         /// </value>
         public string Arguments
         {
             get
             {
-                StringBuilder sb = new StringBuilder(INFOTIPSIZE);
-                this.m_Link.GetArguments(sb, sb.Capacity);
+                var sb = new StringBuilder(Infotipsize);
+                this.currentShellLink.GetArguments(sb, sb.Capacity);
                 return sb.ToString();
             }
-            set { this.m_Link.SetArguments(value); }
+
+            set
+            {
+                this.currentShellLink.SetArguments(value);
+            }
         }
 
         /// <value>
@@ -109,244 +101,282 @@ namespace Illallangi.ShellLink
         {
             get
             {
-                StringBuilder sb = new StringBuilder(INFOTIPSIZE);
-                this.m_Link.GetDescription(sb, sb.Capacity);
+                var sb = new StringBuilder(Infotipsize);
+                this.currentShellLink.GetDescription(sb, sb.Capacity);
                 return sb.ToString();
             }
-            set { this.m_Link.SetDescription(value); }
+
+            set
+            {
+                this.currentShellLink.SetDescription(value);
+            }
         }
 
+        /// <summary>
+        /// Gets or sets the working directory (aka start in directory) of the shortcut.
+        /// </summary>
         /// <value>
-        ///   Gets or sets the working directory (aka start in directory) of the shortcut.
+        /// The working directory (aka start in directory) of the shortcut.
         /// </value>
         public string WorkingDirectory
         {
             get
             {
-                StringBuilder sb = new StringBuilder(MAX_PATH);
-                this.m_Link.GetWorkingDirectory(sb, sb.Capacity);
+                var sb = new StringBuilder(MaxPath);
+                this.currentShellLink.GetWorkingDirectory(sb, sb.Capacity);
                 return sb.ToString();
             }
-            set { this.m_Link.SetWorkingDirectory(value); }
+
+            set
+            {
+                this.currentShellLink.SetWorkingDirectory(value);
+            }
         }
 
-        //
-        // If Path returns an empty string, the shortcut is associated with
-        // a PIDL instead, which can be retrieved with IShellLink.GetIDList().
-        // This is beyond the scope of this wrapper class.
-        //
+        /// <summary>
+        /// Gets or sets the target path of the shortcut.
+        /// </summary>
         /// <value>
-        ///   Gets or sets the target path of the shortcut.
+        /// The target path of the shortcut.
         /// </value>
+        /// <comment>
+        /// If Path returns an empty string, the shortcut is associated with
+        /// a PIDL instead, which can be retrieved with IShellLink.GetIDList().
+        /// This is beyond the scope of this wrapper class.
+        /// </comment>
         public string Path
         {
             get
             {
-#if UNICODE
-        WIN32_FIND_DATAW wfd = new WIN32_FIND_DATAW();
-#else
-                WIN32_FIND_DATAA wfd = new WIN32_FIND_DATAA();
-#endif
-                StringBuilder sb = new StringBuilder(MAX_PATH);
-
-                this.m_Link.GetPath(sb, sb.Capacity, out wfd, SLGP_FLAGS.SLGP_UNCPRIORITY);
+                WIN32_FIND_DATAA wfd;
+                var sb = new StringBuilder(MaxPath);
+                this.currentShellLink.GetPath(sb, sb.Capacity, out wfd, SLGP_FLAGS.SLGP_UNCPRIORITY);
                 return sb.ToString();
             }
-            set { this.m_Link.SetPath(value); }
+
+            set
+            {
+                this.currentShellLink.SetPath(value);
+            }
         }
 
-        /// <value>
-        ///   Gets or sets the path of the <see cref="Icon"/> assigned to the shortcut.
-        /// </value>
         /// <summary>
-        ///   <seealso cref="IconIndex"/>
+        /// Gets or sets the path of the <see cref="Icon"/> assigned to the shortcut. <seealso cref="IconIndex"/>
         /// </summary>
+        /// <value>
+        /// The path of the <see cref="Icon"/> assigned to the shortcut.
+        /// </value>
         public string IconPath
         {
             get
             {
-                StringBuilder sb = new StringBuilder(MAX_PATH);
-                int nIconIdx;
-                this.m_Link.GetIconLocation(sb, sb.Capacity, out nIconIdx);
+                var sb = new StringBuilder(MaxPath);
+                int iconIdx;
+                this.currentShellLink.GetIconLocation(sb, sb.Capacity, out iconIdx);
                 return sb.ToString();
             }
-            set { this.m_Link.SetIconLocation(value, this.IconIndex); }
+
+            set
+            {
+                this.currentShellLink.SetIconLocation(value, this.IconIndex);
+            }
         }
 
         /// <value>
-        ///   Gets or sets the index of the <see cref="Icon"/> assigned to the shortcut.
-        ///   Set to zero when the <see cref="IconPath"/> property specifies a .ICO file.
+        /// The index of the <see cref="Icon"/> assigned to the shortcut.
         /// </value>
         /// <summary>
-        ///   <seealso cref="IconPath"/>
+        /// Gets or sets the index of the <see cref="Icon"/> assigned to the shortcut.
+        /// Set to zero when the <see cref="IconPath"/> property specifies a .ICO file.
+        /// <seealso cref="IconPath"/>
         /// </summary>
         public int IconIndex
         {
             get
             {
-                StringBuilder sb = new StringBuilder(MAX_PATH);
-                int nIconIdx;
-                this.m_Link.GetIconLocation(sb, sb.Capacity, out nIconIdx);
-                return nIconIdx;
+                var sb = new StringBuilder(MaxPath);
+                int iconIdx;
+                this.currentShellLink.GetIconLocation(sb, sb.Capacity, out iconIdx);
+                return iconIdx;
             }
-            set { this.m_Link.SetIconLocation(this.IconPath, value); }
+
+            set
+            {
+                this.currentShellLink.SetIconLocation(this.IconPath, value);
+            }
         }
 
+        /// <summary>
+        /// Gets the Icon of the shortcut as it will appear in Explorer.
+        /// Use the <see cref="IconPath"/> and <see cref="IconIndex"/>
+        /// properties to change it.
+        /// </summary>
         /// <value>
-        ///   Retrieves the Icon of the shortcut as it will appear in Explorer.
-        ///   Use the <see cref="IconPath"/> and <see cref="IconIndex"/>
-        ///   properties to change it.
+        /// The Icon of the shortcut as it will appear in Explorer.
         /// </value>
         public Icon Icon
         {
             get
             {
-                StringBuilder sb = new StringBuilder(MAX_PATH);
-                int nIconIdx;
-                IntPtr hIcon, hInst;
-                Icon ico, clone;
+                var sb = new StringBuilder(MaxPath);
+                int iconIdx;
 
+                this.currentShellLink.GetIconLocation(sb, sb.Capacity, out iconIdx);
 
-                this.m_Link.GetIconLocation(sb, sb.Capacity, out nIconIdx);
-                hInst = Marshal.GetHINSTANCE(this.GetType().Module);
-                hIcon = Native.ExtractIcon(hInst, sb.ToString(), nIconIdx);
-                if (hIcon == IntPtr.Zero)
+                var inst = Marshal.GetHINSTANCE(this.GetType().Module);
+                var icon = Native.ExtractIcon(inst, sb.ToString(), iconIdx);
+                if (icon == IntPtr.Zero)
+                {
                     return null;
+                }
 
                 // Return a cloned Icon, because we have to free the original ourselves.
-                ico = Icon.FromHandle(hIcon);
-                clone = (Icon)ico.Clone();
+                var ico = Icon.FromHandle(icon);
+                var clone = (Icon)ico.Clone();
                 ico.Dispose();
-                Native.DestroyIcon(hIcon);
+                Native.DestroyIcon(icon);
                 return clone;
             }
         }
 
+        /// <summary>
+        /// Gets or sets the System.Diagnostics.ProcessWindowStyle value
+        /// that decides the initial show state of the shortcut target. Note that
+        /// ProcessWindowStyle.Hidden is not a valid property value.
+        /// </summary>
         /// <value>
-        ///   Gets or sets the System.Diagnostics.ProcessWindowStyle value
-        ///   that decides the initial show state of the shortcut target. Note that
-        ///   ProcessWindowStyle.Hidden is not a valid property value.
+        /// The System.Diagnostics.ProcessWindowStyle value
+        /// that decides the initial show state of the shortcut target.
         /// </value>
         public ProcessWindowStyle WindowStyle
         {
             get
             {
-                int nWS;
-                this.m_Link.GetShowCmd(out nWS);
+                int ws;
+                this.currentShellLink.GetShowCmd(out ws);
 
-                switch (nWS)
+                switch (ws)
                 {
-                    case SW_SHOWMINIMIZED:
-                    case SW_SHOWMINNOACTIVE:
+                    case SwShowminimized:
+                    case SwShowminnoactive:
                         return ProcessWindowStyle.Minimized;
 
-                    case SW_SHOWMAXIMIZED:
+                    case SwShowmaximized:
                         return ProcessWindowStyle.Maximized;
 
                     default:
                         return ProcessWindowStyle.Normal;
                 }
             }
+
             set
             {
-                int nWS;
+                int ws;
 
                 switch (value)
                 {
                     case ProcessWindowStyle.Normal:
-                        nWS = SW_SHOWNORMAL;
+                        ws = SwShownormal;
                         break;
 
                     case ProcessWindowStyle.Minimized:
-                        nWS = SW_SHOWMINNOACTIVE;
+                        ws = SwShowminnoactive;
                         break;
 
                     case ProcessWindowStyle.Maximized:
-                        nWS = SW_SHOWMAXIMIZED;
+                        ws = SwShowmaximized;
                         break;
 
                     default: // ProcessWindowStyle.Hidden
                         throw new ArgumentException("Unsupported ProcessWindowStyle value.");
                 }
 
-                this.m_Link.SetShowCmd(nWS);
-
+                this.currentShellLink.SetShowCmd(ws);
             }
         }
 
+        /// <summary>
+        /// Gets or sets the hotkey for the shortcut.
+        /// </summary>
         /// <value>
-        ///   Gets or sets the hotkey for the shortcut.
+        /// The hotkey for the shortcut.
         /// </value>
         public Keys Hotkey
         {
             get
             {
-                short wHotkey;
-                int dwHotkey;
+                short hotkey;
+                this.currentShellLink.GetHotkey(out hotkey);
 
-                this.m_Link.GetHotkey(out wHotkey);
-
-                //
                 // Convert from IShellLink 16-bit format to Keys enumeration 32-bit value
                 // IShellLink: 0xMMVK
                 // Keys:  0x00MM00VK        
                 //   MM = Modifier (Alt, Control, Shift)
                 //   VK = Virtual key code
-                //       
-                dwHotkey = ((wHotkey & 0xFF00) << 8) | (wHotkey & 0xFF);
-                return (Keys)dwHotkey;
+                return (Keys)(((hotkey & 0xFF00) << 8) | (hotkey & 0xFF));
             }
+
             set
             {
-                short wHotkey;
-
                 if ((value & Keys.Modifiers) == 0)
+                {
                     throw new ArgumentException("Hotkey must include a modifier key.");
+                }
 
-                //    
                 // Convert from Keys enumeration 32-bit value to IShellLink 16-bit format
                 // IShellLink: 0xMMVK
                 // Keys:  0x00MM00VK        
                 //   MM = Modifier (Alt, Control, Shift)
                 //   VK = Virtual key code
-                //       
-                wHotkey = unchecked((short)(((int)(value & Keys.Modifiers) >> 8) | (int)(value & Keys.KeyCode)));
-                this.m_Link.SetHotkey(wHotkey);
-
+                this.currentShellLink.SetHotkey(unchecked((short)(((int)(value & Keys.Modifiers) >> 8) | (int)(value & Keys.KeyCode))));
             }
         }
 
+        #endregion
+        
+        #region Methods
+        
         /// <summary>
         ///   Saves the shortcut to disk.
         /// </summary>
         public void Save()
         {
-            IPersistFile pf = (IPersistFile)this.m_Link;
-            pf.Save(this.m_sPath, true);
+            var pf = (IPersistFile)this.currentShellLink;
+            pf.Save(this.currentShellPath, true);
         }
 
         /// <summary>
-        ///   Returns a reference to the internal ShellLink object,
-        ///   which can be used to perform more advanced operations
-        ///   not supported by this wrapper class, by using the
-        ///   IShellLink interface directly.
+        /// Implementation of the IDispose interface.
         /// </summary>
-        public object ShellLink
+        public void Dispose()
         {
-            get { return this.m_Link; }
+            if (this.currentShellLink == null)
+            {
+                return;
+            }
+
+            Marshal.ReleaseComObject(this.currentShellLink);
+            this.currentShellLink = null;
         }
 
+        #endregion
 
-        #region Native Win32 API functions
-        private class Native
+        #region Classes
+
+        /// <summary>
+        /// Native win32 operations.
+        /// </summary>
+        private static class Native
         {
+            [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1305:FieldNamesMustNotUseHungarianNotation", Justification = "Win32 Native operation.")]
             [DllImport("shell32.dll", CharSet = CharSet.Auto)]
             public static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex);
 
+            [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1305:FieldNamesMustNotUseHungarianNotation", Justification = "Win32 Native operation.")]
             [DllImport("user32.dll")]
             public static extern bool DestroyIcon(IntPtr hIcon);
         }
-        #endregion
 
+        #endregion
     }
 }

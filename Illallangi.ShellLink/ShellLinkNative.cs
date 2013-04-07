@@ -20,10 +20,10 @@
 
 // ReSharper disable InconsistentNaming
 using System;
-using System.Text;
 using System.Runtime.InteropServices;
-using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
+using System.Text;
 
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace Illallangi.ShellLink
 {
@@ -135,13 +135,13 @@ namespace Illallangi.ShellLink
 
         void SetShowCmd(int iShowCmd);
 
-        void GetIconLocation([Out(), MarshalAs(UnmanagedType.LPStr)] StringBuilder pszIconPath,int cchIconPath,out int piIcon);
+        void GetIconLocation([Out] [MarshalAs(UnmanagedType.LPStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
 
-        void SetIconLocation([MarshalAs(UnmanagedType.LPStr)] string pszIconPath,int iIcon);
+        void SetIconLocation([MarshalAs(UnmanagedType.LPStr)] string pszIconPath, int iIcon);
 
-        void SetRelativePath([MarshalAs(UnmanagedType.LPStr)] string pszPathRel,int dwReserved);
+        void SetRelativePath([MarshalAs(UnmanagedType.LPStr)] string pszPathRel, int dwReserved);
 
-        void Resolve(IntPtr hwnd,SLR_FLAGS fFlags);
+        void Resolve(IntPtr hwnd, SLR_FLAGS fFlags);
 
         void SetPath([MarshalAs(UnmanagedType.LPStr)] string pszFile);
     }
@@ -151,21 +151,21 @@ namespace Illallangi.ShellLink
     [Guid("000214F9-0000-0000-C000-000000000046")]
     public interface IShellLinkW
     {
-        void GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,int cchMaxPath,out WIN32_FIND_DATAW pfd,SLGP_FLAGS fFlags);
+        void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,int cchMaxPath,out WIN32_FIND_DATAW pfd,SLGP_FLAGS fFlags);
 
         void GetIDList(out IntPtr ppidl);
 
         void SetIDList(IntPtr pidl);
 
-        void GetDescription([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName,int cchMaxName);
+        void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName,int cchMaxName);
 
         void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
 
-        void GetWorkingDirectory([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir,int cchMaxPath);
+        void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir,int cchMaxPath);
 
         void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
 
-        void GetArguments([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs,int cchMaxPath);
+        void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs,int cchMaxPath);
 
         void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
 
@@ -177,7 +177,7 @@ namespace Illallangi.ShellLink
 
         void SetShowCmd(int iShowCmd);
 
-        void GetIconLocation([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath,int cchIconPath,out int piIcon);
+        void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath,int cchIconPath,out int piIcon);
 
         void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath,int iIcon);
 
@@ -187,7 +187,6 @@ namespace Illallangi.ShellLink
 
         void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
     }
-
 
     [ComImport]
     [Guid("00021401-0000-0000-C000-000000000046")]
