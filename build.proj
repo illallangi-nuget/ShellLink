@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <NuGet Include="$(MSBuildProjectDirectory)\src\.nuget\nuget.exe" />
+    <SignTool Include="$(MSBuildProjectDirectory)\tools\winsdk\signtool.exe" />
   </ItemGroup>
 
   <Target Name="Clean">
@@ -71,6 +72,8 @@
     <MakeDir Directories="$(BuildDir)\bin\lib" />
     <Copy SourceFiles="$(SourceDir)\Illallangi.ShellLink\bin\$(Configuration)\Illallangi.ShellLink.dll"
           DestinationFolder="$(BuildDir)\bin\lib" />
+    <Exec Command='"@(SignTool)" sign /sha1 $(Certificate) /sm /t http://timestamp.verisign.com/scripts/timstamp.dll "$(BuildDir)\bin\lib\Illallangi.ShellLink.dll"' 
+          Condition="$(Certificate) != ''"/>
   </Target>
 
   <Target Name="Zip" DependsOnTargets="Copy">
