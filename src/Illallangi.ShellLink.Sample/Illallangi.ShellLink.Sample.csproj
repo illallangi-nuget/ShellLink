@@ -37,14 +37,12 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShellLinkTest.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Illallangi.ShellLink\Illallangi.ShellLink.csproj">
       <Project>{28923f6e-8a68-4bc8-a507-825b09c3f64e}</Project>
