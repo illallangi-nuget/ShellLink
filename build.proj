@@ -1,0 +1,95 @@
+<Project ToolsVersion="4.0" DefaultTargets="All" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildProjectDirectory)\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+  
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)'==''">Release</Configuration>
+    <Version>$(BUILD_NUMBER)</Version>
+    <GitCommitHash>$(BUILD_VCS_NUMBER)</GitCommitHash>
+    <GitCommitHash Condition=" '$(GitCommitHash)' != '' ">$(GitCommitHash.Substring(0, 8))</GitCommitHash>
+    <!-- dev config -->
+    <Version Condition=" '$(Version)' == '' ">0.0.0.1</Version>
+    <SourceDir>$(MSBuildProjectDirectory)\src</SourceDir>
+    <ArtifactsDir>$(MSBuildProjectDirectory)\artifacts</ArtifactsDir>
+    <BuildDir>$(MSBuildProjectDirectory)\build</BuildDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <NuGet Include="$(MSBuildProjectDirectory)\src\.nuget\nuget.exe" />
+  </ItemGroup>
+
+  <Target Name="Clean">
+    <RemoveDir Directories="$(BuildDir)" />
+    <RemoveDir Directories="$(ArtifactsDir)" />
+  </Target>
+  
+  <Target Name="Version" DependsOnTargets="Clean">
+    <Message Text="=========== Version ===========" Importance="High" />
+
+    <GitVersion LocalPath="$(MSBuildProjectDirectory)" Condition=" '$(GitCommitHash)' == '' ">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+    </GitVersion>
+
+    <AssemblyInfo CodeLanguage="CS"
+                  OutputFile="$(SourceDir)\Illallangi.ShellLink\Properties\AssemblyInfo.cs"
+                  AssemblyTitle="Shell Link"
+                  AssemblyDescription=""
+                  AssemblyCompany="Illallangi Enterprises"
+                  AssemblyProduct="Shell Link"
+                  AssemblyCopyright="Copyright © Illallangi Enterprises 2013"
+                  ComVisible="false"
+                  AssemblyInformationalVersion="Built from hash '$(GitCommitHash)'"
+                  Guid="E793096D-2F2F-426C-BF99-5D1E1890687D"
+                  AssemblyVersion="$(Version)"
+                  AssemblyFileVersion="$(Version)"
+                  Condition="$(Version) != '0.0.0.2'" />
+
+    <AssemblyInfo CodeLanguage="CS"
+                  OutputFile="$(SourceDir)\Illallangi.ShellLink.Sample\Properties\AssemblyInfo.cs"
+                  AssemblyTitle="Shell Link Sample"
+                  AssemblyDescription=""
+                  AssemblyCompany="Illallangi Enterprises"
+                  AssemblyProduct="Shell Link Sample"
+                  AssemblyCopyright="Copyright © Illallangi Enterprises 2013"
+                  ComVisible="false"
+                  AssemblyInformationalVersion="Built from hash '$(GitCommitHash)'"
+                  Guid="132c1f66-5504-48d0-8b96-fa256681eb52"
+                  AssemblyVersion="$(Version)"
+                  AssemblyFileVersion="$(Version)"
+                  Condition="$(Version) != '0.0.0.2'" />
+  </Target>
+
+  <Target Name="Compile" DependsOnTargets="Version">
+    <Message Text="=========== Compile ===========" Importance="High" />
+
+    <MSBuild Projects="$(SourceDir)\Illallangi.ShellLink.sln" Properties="Configuration=$(Configuration)" Targets="Rebuild" />
+  </Target>
+
+  <Target Name="Copy" DependsOnTargets="Compile">
+    <Message Text="=========== Copy ===========" Importance="High" />
+
+    <MakeDir Directories="$(BuildDir)\bin\lib" />
+    <Copy SourceFiles="$(SourceDir)\Illallangi.ShellLink\bin\$(Configuration)\Illallangi.ShellLink.dll"
+          DestinationFolder="$(BuildDir)\bin\lib" />
+  </Target>
+
+  <Target Name="Zip" DependsOnTargets="Copy">
+    <Message Text="=========== Zip ===========" Importance="High" />
+
+    <CreateItem Include="$(BuildDir)\bin\**\*.*" >
+      <Output ItemName="ZipFiles" TaskParameter="Include"/>
+    </CreateItem>
+
+    <Zip ZipFileName="$(ArtifactsDir)\Illallangi Enterprises Shell Link v$(Version).zip" WorkingDirectory="$(BuildDir)\bin" Files="@(ZipFiles)" />
+  </Target>
+
+  <Target Name="NuGet" DependsOnTargets="Copy">
+    <Message Text="=========== NuGet ===========" Importance="High" />
+    <Exec Command='"@(NuGet)" pack "$(MSBuildProjectDirectory)\build.nuspec" -OutputDirectory $(ArtifactsDir) -BasePath $(BuildDir)\bin -Version $(Version) -verbosity detailed -NoPackageAnalysis' />
+  </Target>
+
+  <Target Name="All" DependsOnTargets="Zip;NuGet">
+    <Message Text="=========== All Done ===========" Importance="High" />
+  </Target>
+
+</Project>

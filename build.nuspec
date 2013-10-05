@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Illallangi.ShellLink</id>
+    <version>$version$</version>
+    <title>Shell Link</title>
+    <authors>Illallangi Enterprises</authors>
+    <owners>Illallangi Enterprises</owners>
+    <projectUrl>http://illallangi.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A library to create shortcuts programatically</description>
+    <copyright>Copyright 2013</copyright>
+    <tags>Shortcuts</tags>
+  </metadata>
+</package>

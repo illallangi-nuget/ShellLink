@@ -4,6 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illallangi.ShellLink", "Ill
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Illallangi.ShellLink.Sample", "Illallangi.ShellLink.Sample\Illallangi.ShellLink.Sample.csproj", "{B2216F12-385C-4561-BC06-A2C626684698}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C05ACE6A-50D9-4E1B-A93F-B67D9B058345}"
+	ProjectSection(SolutionItems) = preProject
+		..\build.cmd = ..\build.cmd
+		..\build.nuspec = ..\build.nuspec
+		..\build.proj = ..\build.proj
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
