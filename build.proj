@@ -42,7 +42,7 @@
                   Guid="E793096D-2F2F-426C-BF99-5D1E1890687D"
                   AssemblyVersion="$(Version)"
                   AssemblyFileVersion="$(Version)"
-                  Condition="$(Version) != '0.0.0.2'" />
+                  Condition="$(Version) != '0.0.0.1'" />
 
     <AssemblyInfo CodeLanguage="CS"
                   OutputFile="$(SourceDir)\Illallangi.ShellLink.Sample\Properties\AssemblyInfo.cs"
@@ -56,7 +56,7 @@
                   Guid="132c1f66-5504-48d0-8b96-fa256681eb52"
                   AssemblyVersion="$(Version)"
                   AssemblyFileVersion="$(Version)"
-                  Condition="$(Version) != '0.0.0.2'" />
+                  Condition="$(Version) != '0.0.0.1'" />
   </Target>
 
   <Target Name="Compile" DependsOnTargets="Version">
